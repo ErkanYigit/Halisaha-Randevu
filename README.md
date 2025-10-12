@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HaliSaha Randevu Sistemi
 
-## Getting Started
+Modern ve kullanıcı dostu bir halı saha rezervasyon platformu. Halı saha sahipleri ve futbol severler için geliştirilmiş kapsamlı bir web uygulaması.
 
-First, run the development server:
+## Özellikler
 
+- 🏟️ Halı Saha Listesi ve Detaylı Arama
+- 📅 Rezervasyon Sistemi
+- 🌍 En Yakın Halı Saha Bulma
+- 👥 Takım Oluşturma
+- 🏆 Turnuva Sistemi
+- 🌓 Çoklu Tema Desteği (Aydınlık, Default, Night Mode)
+- 📱 Responsive Tasarım
+- 🔐 Kullanıcı Kimlik Doğrulama
+- 💳 Ödeme Sistemi Entegrasyonu
+- 📍 Google Maps Entegrasyonu
+
+## Teknolojiler
+
+- Next.js 14
+- React
+- TypeScript
+- Prisma ORM
+- MySQL
+- NextAuth.js
+- Tailwind CSS
+- Framer Motion
+- Google Maps API
+- Leaflet Maps
+
+## Kurulum
+
+1. Repoyu klonlayın:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/KULLANICI_ADINIZ/HaliSaha-Randevu.git
+cd HaliSaha-Randevu
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Bağımlılıkları yükleyin:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. `.env` dosyasını oluşturun:
+```env
+DATABASE_URL="mysql://kullanici:sifre@localhost:3306/hali_saha_db"
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+GOOGLE_MAPS_API_KEY="your-google-maps-api-key"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Veritabanı migration'larını çalıştırın:
+```bash
+npx prisma migrate deploy
+```
 
-## Learn More
+5. Veritabanı seed işlemini gerçekleştirin:
+```bash
+npx prisma db seed
+```
 
-To learn more about Next.js, take a look at the following resources:
+6. Uygulamayı başlatın:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Katkıda Bulunma
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Bu repoyu fork edin
+2. Feature branch'i oluşturun (`git checkout -b feature/AmazingFeature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Add some AmazingFeature'`)
+4. Branch'inizi push edin (`git push origin feature/AmazingFeature`)
+5. Pull Request oluşturun
 
-## Deploy on Vercel
+## Lisans
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## İletişim
+
+Proje Sahibi - [@GITHUB_KULLANICI_ADINIZ](https://github.com/KULLANICI_ADINIZ)
+
+Proje Linki: [https://github.com/KULLANICI_ADINIZ/HaliSaha-Randevu](https://github.com/KULLANICI_ADINIZ/HaliSaha-Randevu)

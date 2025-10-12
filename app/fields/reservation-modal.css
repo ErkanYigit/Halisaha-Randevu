@@ -1,0 +1,37 @@
+/* reservation-modal.css */
+
+.modern-datepicker {
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px 0 rgba(80, 0, 120, 0.10);
+  border: 1px solid #f3e8ff;
+  padding: 0.5rem;
+  background: #fff;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: linear-gradient(90deg, #a78bfa 0%, #f472b6 100%) !important;
+  color: #fff !important;
+  border-radius: 0.75rem !important;
+}
+
+.react-datepicker__day:hover {
+  background: #f3e8ff !important;
+  color: #a21caf !important;
+  border-radius: 0.75rem !important;
+}
+
+.react-datepicker__header {
+  background: transparent;
+  border-bottom: none;
+}
+
+.react-datepicker__current-month {
+  color: #a21caf;
+  font-weight: bold;
+}
+
+.react-datepicker__day-names {
+  color: #a21caf;
+  font-weight: 500;
+}

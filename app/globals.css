@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+/* Tema değişkenleri */
+:root {
+  --bg-gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --bg-gradient-light: linear-gradient(135deg, #f0f2f5 0%, #e5e7eb 50%, #d1d5db 100%);
+  --bg-gradient-third: linear-gradient(135deg, #000000 0%, #111111 50%, #222222 100%);
+  --text-dark: #e5e7eb;
+  --text-light: #1a1a2e;
+  --text-third: #e5e5e5;
+}
+
+/* Aydınlık tema */
+.light {
+  --navbar-bg: linear-gradient(to right, #ffffff, #f3f4f6, #e5e7eb);
+  --navbar-border: #e5e7eb;
+  --text-color: var(--text-light);
+  --link-hover: #3b82f6;
+  background: var(--bg-gradient-light);
+  color: var(--text-light);
+}
+
+/* Karanlık tema */
+.dark {
+  --navbar-bg: linear-gradient(to right, #1a1a2e, #16213e, #0f3460);
+  --navbar-border: #23234b;
+  --text-color: var(--text-dark);
+  --link-hover: #60a5fa;
+  background: var(--bg-gradient-dark);
+  color: var(--text-dark);
+}
+
+/* Night Mode */
+.third {
+  /* Temel renkler */
+  --navbar-bg: linear-gradient(to right, #000000, #111111, #222222);
+  --navbar-border: #333333;
+  --text-color: var(--text-third);
+  --link-hover: #666666;
+  background: var(--bg-gradient-third);
+  color: var(--text-third);
+
+  /* Kartlar ve bileşenler */
+  --card-bg: #111111;
+  --card-border: #333333;
+  --card-hover: #222222;
+  
+  /* Metin renkleri */
+  --text-primary: #e5e5e5;
+  --text-secondary: #999999;
+  --text-muted: #666666;
+  
+  /* Butonlar */
+  --button-bg: #222222;
+  --button-text: #e5e5e5;
+  --button-border: #333333;
+  --button-hover: #333333;
+  
+  /* Form elemanları */
+  --input-bg: #111111;
+  --input-border: #333333;
+  --input-text: #e5e5e5;
+  --input-placeholder: #666666;
+  
+  /* Vurgular ve aksanlar */
+  --accent-primary: #666666;
+  --accent-secondary: #444444;
+  --accent-hover: #888888;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
+} 
