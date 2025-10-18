@@ -49,13 +49,27 @@ export default function AppointmentsPage() {
 
   const confirmCancel = async () => {
     if (!selectedAppointment) return;
-    // DELETE ile tamamen sil
-    await fetch(`/api/appointments/${selectedAppointment.id}`, {
-      method: 'DELETE'
-    });
-    setAppointments(prev => prev.filter(app => app.id !== selectedAppointment.id));
-    setShowCancelModal(false);
-    setSelectedAppointment(null);
+    try {
+      // Status'u cancelled yap
+      const response = await fetch(`/api/appointments/${selectedAppointment.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'cancelled' })
+      });
+      
+      if (response.ok) {
+        // Liste güncelle - iptal edilen randevuyu kaldır
+        setAppointments(prev => prev.filter(app => app.id !== selectedAppointment.id));
+        setShowCancelModal(false);
+        setSelectedAppointment(null);
+      } else {
+        console.error('İptal işlemi başarısız');
+      }
+    } catch (error) {
+      console.error('İptal işlemi sırasında hata:', error);
+    }
   };
 
   return (
@@ -178,7 +192,7 @@ export default function AppointmentsPage() {
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  {appointment.status === 'pending' && (
+                  {(appointment.status === 'pending' || appointment.status === 'confirmed') && (
                     <>
                       <button onClick={() => handleShowDetails(appointment)} className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all">
                         Detaylar
@@ -287,7 +301,7 @@ export default function AppointmentsPage() {
                 theme === 'third'
                   ? 'text-[#999999]'
                   : 'text-gray-700'
-              }`}>Bu rezervasyonu iptal etmek istediğinize emin misiniz?</p>
+              }`}>Bu rezervasyonu iptal etmek istediğinize emin misiniz? İptal edilen rezervasyon listeden kaldırılacak ve saat tekrar müsait hale gelecektir.</p>
               <div className="flex justify-end gap-2">
                 <button className={`px-4 py-2 rounded-lg font-semibold ${
                   theme === 'third'

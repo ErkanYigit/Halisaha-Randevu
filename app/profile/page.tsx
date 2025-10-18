@@ -45,6 +45,24 @@ interface UserProfile {
   balance?: number;
 }
 
+interface Appointment {
+  id: string;
+  fieldName: string;
+  fieldLocation: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  depositPaid: boolean;
+}
+
+interface Payment {
+  id: string;
+  amount: number;
+  method: string;
+  date: string;
+}
+
 type CityType = { name: string; districts: string[] };
 const cities: CityType[] = turkeyCities as CityType[];
 
@@ -211,7 +229,7 @@ export default function ProfilePage() {
 
   // Geçmiş randevu içeriği
   const HistoryModal = () => {
-    const [appointments, setAppointments] = useState([]);
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
       fetch("/api/appointments/history")
@@ -223,30 +241,30 @@ export default function ProfilePage() {
       <Modal isOpen={showHistory} onClose={() => setShowHistory(false)} size="4xl">
         <ModalOverlay />
         <ModalContent bgGradient={
-          theme === 'dark'
+          theme === 'default'
             ? "linear(to-br, #4f1c96, #6d28d9, #a21caf)"
             : theme === 'third'
               ? "linear(to-br, #111111, #222222, #333333)"
               : "linear(to-br, #f0f9ff, #e0f2fe, #dbeafe)"
         }>
-          <ModalHeader color={theme === 'third' ? "#e5e5e5" : "white"}>Geçmiş Randevularım</ModalHeader>
-          <ModalCloseButton color={theme === 'third' ? "#e5e5e5" : "white"} />
+          <ModalHeader color={theme === 'light' ? "gray.800" : theme === 'third' ? "#e5e5e5" : "white"}>Geçmiş Randevularım</ModalHeader>
+          <ModalCloseButton color={theme === 'light' ? "gray.800" : theme === 'third' ? "#e5e5e5" : "white"} />
           <ModalBody>
             {loading ? (
               <Flex justify="center" align="center" minH="200px"><Spinner size="xl" color="yellow.400" /></Flex>
             ) : appointments.length === 0 ? (
               <Flex justify="center" align="center" minH="200px">
-                <Text color="whiteAlpha.800" fontSize="xl">Henüz geçmiş randevunuz yok.</Text>
+                <Text color={theme === 'light' ? "gray.600" : "whiteAlpha.800"} fontSize="xl">Henüz geçmiş randevunuz yok.</Text>
               </Flex>
             ) : (
               <VStack spacing={6} align="stretch">
                 {appointments.map(app => (
-                  <Box key={app.id} bg="whiteAlpha.200" borderRadius="xl" p={6} boxShadow="md">
+                  <Box key={app.id} bg={theme === 'light' ? "gray.100" : "whiteAlpha.200"} borderRadius="xl" p={6} boxShadow="md">
                     <Flex align="center" gap={4} mb={2}>
                       <FaFutbol size={32} color="#fbbf24" />
                       <Box flex={1}>
-                        <Text fontSize="xl" fontWeight="bold" color="white">{app.fieldName}</Text>
-                        <Flex align="center" gap={2} color="whiteAlpha.800" fontSize="md">
+                        <Text fontSize="xl" fontWeight="bold" color={theme === 'light' ? "gray.800" : "white"}>{app.fieldName}</Text>
+                        <Flex align="center" gap={2} color={theme === 'light' ? "gray.600" : "whiteAlpha.800"} fontSize="md">
                           <FaMapMarkerAlt />
                           <Text>{app.fieldLocation}</Text>
                         </Flex>
@@ -275,7 +293,7 @@ export default function ProfilePage() {
   };
   // Ödeme geçmişi içeriği
   const PaymentsModal = () => {
-    const [payments, setPayments] = useState([]);
+    const [payments, setPayments] = useState<Payment[]>([]);
     const [loading, setLoading] = useState(true);
     useEffect(() => {
       fetch("/api/balance/history")
@@ -287,30 +305,30 @@ export default function ProfilePage() {
       <Modal isOpen={showPayments} onClose={() => setShowPayments(false)} size="4xl">
         <ModalOverlay />
         <ModalContent bgGradient={
-          theme === 'dark'
+          theme === 'default'
             ? "linear(to-br, #4f1c96, #6d28d9, #a21caf)"
             : theme === 'third'
               ? "linear(to-br, #111111, #222222, #333333)"
               : "linear(to-br, #f0f9ff, #e0f2fe, #dbeafe)"
         }>
-          <ModalHeader color="white">Bakiye Yükleme Geçmişim</ModalHeader>
-          <ModalCloseButton color="white" />
+          <ModalHeader color={theme === 'light' ? "gray.800" : "white"}>Bakiye Yükleme Geçmişim</ModalHeader>
+          <ModalCloseButton color={theme === 'light' ? "gray.800" : "white"} />
           <ModalBody>
             {loading ? (
               <Flex justify="center" align="center" minH="200px"><Spinner size="xl" color="yellow.400" /></Flex>
             ) : payments.length === 0 ? (
               <Flex justify="center" align="center" minH="200px">
-                <Text color="whiteAlpha.800" fontSize="xl">Hiç bakiye yüklemesi yapılmamış.</Text>
+                <Text color={theme === 'light' ? "gray.600" : "whiteAlpha.800"} fontSize="xl">Hiç bakiye yüklemesi yapılmamış.</Text>
               </Flex>
             ) : (
               <VStack spacing={6} align="stretch">
                 {payments.map(pay => (
-                  <Box key={pay.id} bg="whiteAlpha.200" borderRadius="xl" p={6} boxShadow="md">
+                  <Box key={pay.id} bg={theme === 'light' ? "gray.100" : "whiteAlpha.200"} borderRadius="xl" p={6} boxShadow="md">
                     <Flex align="center" gap={4} mb={2}>
                       {pay.method === "card" ? <FaCreditCard size={32} color="#fbbf24" /> : <FaMoneyCheckAlt size={32} color="#38b2ac" />}
                       <Box flex={1}>
-                        <Text fontSize="xl" fontWeight="bold" color="white">₺{pay.amount.toLocaleString("tr-TR")}</Text>
-                        <Flex align="center" gap={2} color="whiteAlpha.800" fontSize="md">
+                        <Text fontSize="xl" fontWeight="bold" color={theme === 'light' ? "gray.800" : "white"}>₺{pay.amount.toLocaleString("tr-TR")}</Text>
+                        <Flex align="center" gap={2} color={theme === 'light' ? "gray.600" : "whiteAlpha.800"} fontSize="md">
                           <Text>Yöntem: {pay.method === "card" ? "Kart" : "Diğer"}</Text>
                         </Flex>
                       </Box>
@@ -334,7 +352,7 @@ export default function ProfilePage() {
 
   return (
     <Box minH="100vh" bgGradient={
-      theme === 'dark' 
+      theme === 'default' 
         ? "linear(to-br, #4f1c96, #6d28d9, #a21caf)" 
         : theme === 'third'
           ? "linear(to-br, black, #111111, #222222)"
@@ -343,7 +361,7 @@ export default function ProfilePage() {
       <Flex direction="column" align="center" maxW="3xl" mx="auto" gap={8}>
         {/* Profil Kartı */}
         <Box w="full" bg={
-          theme === 'dark' 
+          theme === 'default' 
             ? "whiteAlpha.200" 
             : theme === 'third'
               ? "#111111"
@@ -355,7 +373,7 @@ export default function ProfilePage() {
               {/* Düzenle butonu kaldırıldı */}
             </Box>
             <Box flex={1} color={
-              theme === 'dark' 
+              theme === 'default' 
                 ? "white" 
                 : theme === 'third'
                   ? "#e5e5e5"
@@ -386,7 +404,7 @@ export default function ProfilePage() {
         <Flex w="full" gap={6} justify="center">
           <Button 
             leftIcon={<FaHistory />} 
-            colorScheme={theme === 'third' ? "blackAlpha" : theme === 'dark' ? "whiteAlpha" : "gray"} 
+            colorScheme={theme === 'third' ? "blackAlpha" : theme === 'default' ? "whiteAlpha" : "gray"} 
             variant="solid" 
             size="lg" 
             w="40" 
@@ -401,7 +419,7 @@ export default function ProfilePage() {
           </Button>
           <Button 
             leftIcon={<FaCreditCard />} 
-            colorScheme={theme === 'third' ? "blackAlpha" : theme === 'dark' ? "whiteAlpha" : "gray"} 
+            colorScheme={theme === 'third' ? "blackAlpha" : theme === 'default' ? "whiteAlpha" : "gray"} 
             variant="solid" 
             size="lg" 
             w="40" 
@@ -416,7 +434,7 @@ export default function ProfilePage() {
           </Button>
           <Button 
             leftIcon={<FaCog />} 
-            colorScheme={theme === 'third' ? "blackAlpha" : theme === 'dark' ? "whiteAlpha" : "gray"} 
+            colorScheme={theme === 'third' ? "blackAlpha" : theme === 'default' ? "whiteAlpha" : "gray"} 
             variant="solid" 
             size="lg" 
             w="40" 
@@ -434,21 +452,21 @@ export default function ProfilePage() {
         <Modal isOpen={isEditing} onClose={() => setIsEditing(false)} size="lg" isCentered>
           <ModalOverlay />
           <ModalContent bgGradient={
-            theme === 'dark' 
+            theme === 'default' 
               ? "linear(to-br, #2d006e, #6d28d9, #a21caf)" 
               : theme === 'third'
                 ? "linear(to-br, #111111, #222222, #333333)"
                 : "linear(to-br, #f0f9ff, #e0f2fe, #dbeafe)"
           } borderRadius="2xl" boxShadow="2xl">
             <ModalHeader color={
-              theme === 'dark' 
+              theme === 'default' 
                 ? "white" 
                 : theme === 'third'
                   ? "#e5e5e5"
                   : "gray.800"
             } fontSize="2xl" fontWeight="extrabold" letterSpacing="wide">Profil Bilgilerini Düzenle</ModalHeader>
             <ModalCloseButton color={
-              theme === 'dark' 
+              theme === 'default' 
                 ? "white" 
                 : theme === 'third'
                   ? "#e5e5e5"
@@ -458,54 +476,143 @@ export default function ProfilePage() {
               <form id="profile-edit-form" onSubmit={handleSubmit}>
                 <VStack gap={5}>
                   <div style={{ width: "100%" }}>
-                    <label style={{ color: '#c4b5fd', fontSize: 13, fontWeight: 600, marginBottom: 4, display: 'block', letterSpacing: 1 }}>Ad Soyad</label>
-                    <input name="name" value={formData.name} onChange={handleInputChange} style={{ width: '100%', borderRadius: 16, padding: 14, background: 'rgba(255,255,255,0.08)', color: 'white', border: '1.5px solid #a21caf', fontSize: 18, fontWeight: 500, outline: 'none', marginTop: 2, transition: 'border 0.2s' }} placeholder="Adınızı girin" />
+                    <label style={{ 
+                      color: theme === 'light' ? '#4a5568' : '#c4b5fd', 
+                      fontSize: 13, 
+                      fontWeight: 600, 
+                      marginBottom: 4, 
+                      display: 'block', 
+                      letterSpacing: 1 
+                    }}>Ad Soyad</label>
+                    <input 
+                      name="name" 
+                      value={formData.name} 
+                      onChange={handleInputChange} 
+                      style={{ 
+                        width: '100%', 
+                        borderRadius: 16, 
+                        padding: 14, 
+                        background: theme === 'light' ? 'white' : 'rgba(255,255,255,0.08)', 
+                        color: theme === 'light' ? '#2d3748' : 'white', 
+                        border: theme === 'light' ? '1.5px solid #e2e8f0' : '1.5px solid #a21caf', 
+                        fontSize: 18, 
+                        fontWeight: 500, 
+                        outline: 'none', 
+                        marginTop: 2, 
+                        transition: 'border 0.2s' 
+                      }} 
+                      placeholder="Adınızı girin" 
+                    />
                   </div>
                   <div style={{ width: "100%" }}>
-                    <label style={{ color: '#c4b5fd', fontSize: 13, fontWeight: 600, marginBottom: 4, display: 'block', letterSpacing: 1 }}>E-posta</label>
-                    <input name="email" type="email" value={formData.email} onChange={handleInputChange} readOnly style={{ width: '100%', borderRadius: 16, padding: 14, background: 'rgba(255,255,255,0.08)', color: '#e0e7ff', border: '1.5px solid #a21caf', fontSize: 18, fontWeight: 500, outline: 'none', marginTop: 2, opacity: 0.7 }} />
+                    <label style={{ 
+                      color: theme === 'light' ? '#4a5568' : '#c4b5fd', 
+                      fontSize: 13, 
+                      fontWeight: 600, 
+                      marginBottom: 4, 
+                      display: 'block', 
+                      letterSpacing: 1 
+                    }}>E-posta</label>
+                    <input 
+                      name="email" 
+                      type="email" 
+                      value={formData.email} 
+                      onChange={handleInputChange} 
+                      readOnly 
+                      style={{ 
+                        width: '100%', 
+                        borderRadius: 16, 
+                        padding: 14, 
+                        background: theme === 'light' ? '#f7fafc' : 'rgba(255,255,255,0.08)', 
+                        color: theme === 'light' ? '#718096' : '#e0e7ff', 
+                        border: theme === 'light' ? '1.5px solid #e2e8f0' : '1.5px solid #a21caf', 
+                        fontSize: 18, 
+                        fontWeight: 500, 
+                        outline: 'none', 
+                        marginTop: 2, 
+                        opacity: 0.7 
+                      }} 
+                    />
                   </div>
                   <div style={{ width: "100%" }}>
-                    <label style={{ color: '#c4b5fd', fontSize: 13, fontWeight: 600, marginBottom: 4, display: 'block', letterSpacing: 1 }}>Telefon</label>
-                    <input name="phone" value={formData.phone} onChange={handleInputChange} style={{ width: '100%', borderRadius: 16, padding: 14, background: 'rgba(255,255,255,0.08)', color: 'white', border: '1.5px solid #a21caf', fontSize: 18, fontWeight: 500, outline: 'none', marginTop: 2 }} placeholder="Telefon numarası" />
+                    <label style={{ 
+                      color: theme === 'light' ? '#4a5568' : '#c4b5fd', 
+                      fontSize: 13, 
+                      fontWeight: 600, 
+                      marginBottom: 4, 
+                      display: 'block', 
+                      letterSpacing: 1 
+                    }}>Telefon</label>
+                    <input 
+                      name="phone" 
+                      value={formData.phone} 
+                      onChange={handleInputChange} 
+                      style={{ 
+                        width: '100%', 
+                        borderRadius: 16, 
+                        padding: 14, 
+                        background: theme === 'light' ? 'white' : 'rgba(255,255,255,0.08)', 
+                        color: theme === 'light' ? '#2d3748' : 'white', 
+                        border: theme === 'light' ? '1.5px solid #e2e8f0' : '1.5px solid #a21caf', 
+                        fontSize: 18, 
+                        fontWeight: 500, 
+                        outline: 'none', 
+                        marginTop: 2 
+                      }} 
+                      placeholder="Telefon numarası" 
+                    />
                   </div>
                   <div style={{ width: "100%" }}>
-                    <label style={{ color: '#c4b5fd', fontSize: 13, fontWeight: 600, marginBottom: 4, display: 'block', letterSpacing: 1 }}>Şehir</label>
+                    <label style={{ 
+                      color: theme === 'light' ? '#4a5568' : '#c4b5fd', 
+                      fontSize: 13, 
+                      fontWeight: 600, 
+                      marginBottom: 4, 
+                      display: 'block', 
+                      letterSpacing: 1 
+                    }}>Şehir</label>
                     <Select
                       value={selectedCity}
                       onChange={handleCityChange}
                       borderRadius="xl"
-                      bgGradient="linear(to-r, #6d28d9, #a21caf)"
-                      color="white"
+                      bgGradient={theme === 'light' ? "linear(to-r, #e2e8f0, #cbd5e0)" : "linear(to-r, #6d28d9, #a21caf)"}
+                      color={theme === 'light' ? "#2d3748" : "white"}
                       fontWeight="bold"
                       fontSize="lg"
                       placeholder="Şehir seçin"
-                      _placeholder={{ color: "whiteAlpha.700" }}
-                      _focus={{ borderColor: "#a21caf" }}
+                      _placeholder={{ color: theme === 'light' ? "gray.500" : "whiteAlpha.700" }}
+                      _focus={{ borderColor: theme === 'light' ? "#4a5568" : "#a21caf" }}
                       mb={selectedCity ? 0 : 2}
                     >
                       {cities.map((city) => (
-                        <option key={city.name} value={city.name} style={{ color: "#6d28d9" }}>{city.name}</option>
+                        <option key={city.name} value={city.name} style={{ color: theme === 'light' ? "#2d3748" : "#6d28d9" }}>{city.name}</option>
                       ))}
                     </Select>
                   </div>
                   {selectedCity && (
                     <div style={{ width: "100%" }}>
-                      <label style={{ color: '#c4b5fd', fontSize: 13, fontWeight: 600, marginBottom: 4, display: 'block', letterSpacing: 1 }}>İlçe</label>
+                      <label style={{ 
+                        color: theme === 'light' ? '#4a5568' : '#c4b5fd', 
+                        fontSize: 13, 
+                        fontWeight: 600, 
+                        marginBottom: 4, 
+                        display: 'block', 
+                        letterSpacing: 1 
+                      }}>İlçe</label>
                       <Select
                         value={selectedDistrict}
                         onChange={handleDistrictChange}
                         borderRadius="xl"
-                        bgGradient="linear(to-r, #a21caf, #6d28d9)"
-                        color="white"
+                        bgGradient={theme === 'light' ? "linear(to-r, #e2e8f0, #cbd5e0)" : "linear(to-r, #a21caf, #6d28d9)"}
+                        color={theme === 'light' ? "#2d3748" : "white"}
                         fontWeight="bold"
                         fontSize="lg"
                         placeholder="İlçe seçin"
-                        _placeholder={{ color: "whiteAlpha.700" }}
-                        _focus={{ borderColor: "#a21caf" }}
+                        _placeholder={{ color: theme === 'light' ? "gray.500" : "whiteAlpha.700" }}
+                        _focus={{ borderColor: theme === 'light' ? "#4a5568" : "#a21caf" }}
                       >
                         {cities.find((city) => city.name === selectedCity)?.districts.map((district) => (
-                          <option key={district} value={district} style={{ color: "#a21caf" }}>{district}</option>
+                          <option key={district} value={district} style={{ color: theme === 'light' ? "#2d3748" : "#a21caf" }}>{district}</option>
                         ))}
                       </Select>
                     </div>
@@ -514,8 +621,40 @@ export default function ProfilePage() {
               </form>
             </ModalBody>
             <ModalFooter>
-              <Button type="submit" form="profile-edit-form" bgGradient="linear(to-r, #a21caf, #6d28d9)" color="white" _hover={{ bgGradient: 'linear(to-r, #6d28d9, #a21caf)', boxShadow: '0 0 0 2px #a21caf' }} borderRadius="xl" px={8} py={6} fontWeight="bold" fontSize="lg" mr={3}>Kaydet</Button>
-              <Button onClick={() => setIsEditing(false)} bg="whiteAlpha.700" color="#6d28d9" _hover={{ bg: 'whiteAlpha.900', color: '#a21caf' }} borderRadius="xl" px={8} py={6} fontWeight="bold" fontSize="lg">İptal</Button>
+              <Button 
+                type="submit" 
+                form="profile-edit-form" 
+                bgGradient={theme === 'light' ? "linear(to-r, #4a5568, #2d3748)" : "linear(to-r, #a21caf, #6d28d9)"} 
+                color="white" 
+                _hover={{ 
+                  bgGradient: theme === 'light' ? 'linear(to-r, #2d3748, #1a202c)' : 'linear(to-r, #6d28d9, #a21caf)', 
+                  boxShadow: theme === 'light' ? '0 0 0 2px #4a5568' : '0 0 0 2px #a21caf' 
+                }} 
+                borderRadius="xl" 
+                px={8} 
+                py={6} 
+                fontWeight="bold" 
+                fontSize="lg" 
+                mr={3}
+              >
+                Kaydet
+              </Button>
+              <Button 
+                onClick={() => setIsEditing(false)} 
+                bg={theme === 'light' ? "gray.100" : "whiteAlpha.700"} 
+                color={theme === 'light' ? "#4a5568" : "#6d28d9"} 
+                _hover={{ 
+                  bg: theme === 'light' ? 'gray.200' : 'whiteAlpha.900', 
+                  color: theme === 'light' ? '#2d3748' : '#a21caf' 
+                }} 
+                borderRadius="xl" 
+                px={8} 
+                py={6} 
+                fontWeight="bold" 
+                fontSize="lg"
+              >
+                İptal
+              </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>

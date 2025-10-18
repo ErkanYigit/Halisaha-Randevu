@@ -47,6 +47,7 @@ const mockFields: Field[] = [
 ];
 
 function PaymentModal({ appointmentId, fieldPrice, userId, userBalance, onClose, onSuccess }: { appointmentId: string, fieldPrice: number, userId: string, userBalance: number, onClose: () => void, onSuccess: () => void }) {
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -236,15 +237,35 @@ export default function FieldsPage() {
   };
 
   useEffect(() => {
+    if (isModalOpen && selectedField) {
+      // Modal açıldığında seçili tarih varsa o tarihin dolu saatlerini yükle
+      if (reservationDate) {
+        const dateStr = reservationDate.toISOString().split('T')[0];
+        fetch(`/api/appointments?fieldId=${selectedField.id}&date=${dateStr}`)
+          .then(res => res.json())
+          .then(data => setBusySlots(data));
+      }
+    } else if (!isModalOpen) {
+      setBusySlots([]);
+    }
+  }, [isModalOpen, selectedField]);
+
+  // Tarih değiştiğinde dolu saatleri yeniden yükle
+  useEffect(() => {
     if (isModalOpen && selectedField && reservationDate) {
       const dateStr = reservationDate.toISOString().split('T')[0];
       fetch(`/api/appointments?fieldId=${selectedField.id}&date=${dateStr}`)
         .then(res => res.json())
-        .then(data => setBusySlots(data));
-    } else if (!isModalOpen) {
-      setBusySlots([]);
+        .then(data => {
+          console.log('API\'den dönen dolu saatler:', data); // Debug için
+          setBusySlots(data);
+        })
+        .catch(error => {
+          console.error('Dolu saatler yüklenirken hata:', error);
+          setBusySlots([]);
+        });
     }
-  }, [isModalOpen, selectedField, reservationDate]);
+  }, [reservationDate, selectedField, isModalOpen]);
 
   useEffect(() => {
     setLoading(true);
@@ -265,12 +286,21 @@ export default function FieldsPage() {
 
   const isSlotReserved = (fieldId: string, date: Date | null): boolean => {
     if (!date) return false;
-    const local = reservations.some(r => r.fieldId === fieldId && r.date.toDateString() === date.toDateString() && r.date.getHours() === date.getHours());
+    
+    // Sadece backend'den gelen dolu saatleri kontrol et (yerel rezervasyonları şimdilik devre dışı bırak)
     const backend = (Array.isArray(busySlots) ? busySlots : []).some(slot => {
-      const slotStart = new Date(slot.startTime);
-      return slotStart.toDateString() === date.toDateString() && slotStart.getHours() === date.getHours();
+      if (!slot.startTime) return false;
+      try {
+        const slotStart = new Date(slot.startTime);
+        const isSameDate = slotStart.toDateString() === date.toDateString();
+        const isSameHour = slotStart.getHours() === date.getHours();
+        return isSameDate && isSameHour;
+      } catch (error) {
+        return false;
+      }
     });
-    return local || backend;
+    
+    return backend;
   };
 
   const handleReservation = async () => {
@@ -297,6 +327,11 @@ export default function FieldsPage() {
         if (res.status === 409) {
           setFeedback('Bu saat aralığı dolu!');
         } else if (res.ok && data.status === 'pending' && data.appointmentId) {
+          // Yerel rezervasyon listesine ekle
+          setReservations(prev => [...prev, {
+            fieldId: fieldId,
+            date: reservationDate
+          }]);
           setIsModalOpen(false);
           setPaymentModal({ appointmentId: data.appointmentId });
         } else {
@@ -595,16 +630,19 @@ export default function FieldsPage() {
                       <button
                         key={hour}
                         className={`rounded-xl px-0 py-2 font-semibold text-sm shadow transition-all border ${
-                          isSelected 
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-pink-400 scale-105' 
-                            : theme === 'third'
-                              ? 'bg-[#222222] text-[#999999] border-[#333333] hover:bg-[#333333]'
-                              : 'bg-white text-purple-700 border-purple-100 hover:bg-pink-50'
-                        } ${isSlotReserved(selectedField?.id || '', date) ? 'opacity-40 cursor-not-allowed' : ''}`}
-                        onClick={() => setReservationDate(date)}
+                          isSlotReserved(selectedField?.id || '', date)
+                            ? 'bg-red-500 text-white border-red-400 cursor-not-allowed opacity-60'
+                            : isSelected 
+                              ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-pink-400 scale-105' 
+                              : theme === 'third'
+                                ? 'bg-[#222222] text-[#999999] border-[#333333] hover:bg-[#333333]'
+                                : 'bg-white text-purple-700 border-purple-100 hover:bg-pink-50'
+                        }`}
+                        onClick={() => !isSlotReserved(selectedField?.id || '', date) && setReservationDate(date)}
                         disabled={isSlotReserved(selectedField?.id || '', date)}
+                        title={isSlotReserved(selectedField?.id || '', date) ? 'Bu saat dolu' : ''}
                       >
-                        {hour.toString().padStart(2, '0')}:00
+                        {isSlotReserved(selectedField?.id || '', date) ? 'DOLU' : `${hour.toString().padStart(2, '0')}:00`}
                       </button>
                     );
                   })}
