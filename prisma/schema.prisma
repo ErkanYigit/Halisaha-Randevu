@@ -31,6 +31,8 @@ model User {
   role                  String    @default("user") // user, owner, admin
   fields                Field[]   @relation("FieldOwner")
   balance               Decimal   @default(0)
+  matchRequests         MatchRequest[]
+  joinRequests          JoinRequest[]
 }
 
 model Field {
@@ -54,6 +56,7 @@ model Field {
   features      Json      @default("[]")
   ownerId       String
   owner         User      @relation(fields: [ownerId], references: [id], name: "FieldOwner")
+  matchRequests MatchRequest[]
 }
 
 model Appointment {
@@ -81,4 +84,36 @@ model Review {
   updatedAt     DateTime  @updatedAt
   user          User      @relation(fields: [userId], references: [id])
   field         Field     @relation(fields: [fieldId], references: [id])
+}
+
+model MatchRequest {
+  id                String    @id @default(cuid())
+  fieldId           String
+  date              DateTime
+  time              String    // HH:MM format
+  teamSize          Int
+  lookingForTeamSize Int
+  level             String    // BEGINNER, INTERMEDIATE, ADVANCED
+  feeSharing        String    // SPLIT, FULL, FREE
+  description       String?
+  status            String    @default("OPEN") // OPEN, MATCHED, CLOSED
+  creatorId         String
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  creator           User      @relation(fields: [creatorId], references: [id])
+  field             Field     @relation(fields: [fieldId], references: [id])
+  joinRequests      JoinRequest[]
+}
+
+model JoinRequest {
+  id              String    @id @default(cuid())
+  matchRequestId  String
+  userId          String
+  message         String?
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  matchRequest    MatchRequest @relation(fields: [matchRequestId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id])
 }

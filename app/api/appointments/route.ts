@@ -70,17 +70,20 @@ export async function GET(req: NextRequest) {
   const fieldId = searchParams.get('fieldId');
   const date = searchParams.get('date');
 
-  // Eğer fieldId ve date varsa: dolu saatleri getir (herkes görebilir)
+  // Eğer fieldId ve date varsa: dolu saatleri getir (confirmed ve cancelled olanlar)
   if (fieldId && date) {
     const appointments = await prisma.appointment.findMany({
       where: {
         fieldId,
         date: new Date(date),
-        status: 'confirmed',
+        status: {
+          in: ['confirmed', 'cancelled']
+        },
       },
       select: {
         startTime: true,
         endTime: true,
+        status: true,
       },
     });
     return NextResponse.json(appointments);
@@ -91,10 +94,36 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
   const appointments = await prisma.appointment.findMany({
     where: { userId: user.id },
-    include: { field: { select: { name: true } } },
+    include: { 
+      field: { 
+        select: { 
+          id: true,
+          name: true, 
+          address: true, 
+          price: true 
+        } 
+      } 
+    },
     orderBy: { date: 'desc' },
   });
-  return NextResponse.json(appointments);
+  return NextResponse.json({ success: true, appointments });
+}
+
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params;
+  try {
+    const body = await req.json();
+    const { status } = body;
+    
+    const appointment = await prisma.appointment.update({
+      where: { id },
+      data: { status },
+    });
+    
+    return NextResponse.json({ success: true, appointment });
+  } catch (e) {
+    return NextResponse.json({ error: 'Güncellenemedi.' }, { status: 500 });
+  }
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {

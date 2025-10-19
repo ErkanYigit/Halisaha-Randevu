@@ -32,6 +32,7 @@ export async function GET() {
       features: field.features || []
     }));
 
+    // Frontend bu endpointten doğrudan dizi bekliyor
     return NextResponse.json(formattedFields);
   } catch (error) {
     console.error('Halı sahalar getirilirken hata:', error);

@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
       location: true,
       createdAt: true,
       lastLogin: true,
+      balance: true,
     },
   });
 
@@ -56,6 +57,7 @@ export async function PATCH(req: NextRequest) {
         location: true,
         createdAt: true,
         lastLogin: true,
+        balance: true,
       },
     });
     return NextResponse.json(updated);

@@ -29,12 +29,30 @@ export default function AppointmentsPage() {
     if (status === "authenticated") {
       fetch(`/api/appointments`)
         .then(res => res.json())
-        .then(data => setAppointments(data));
+        .then(data => {
+          console.log('Appointments API Response:', data); // Debug log
+          if (data.success && data.appointments) {
+            setAppointments(data.appointments);
+          } else {
+            console.error('Appointments data format error:', data);
+            setAppointments([]);
+          }
+        })
+        .catch(error => {
+          console.error('Appointments fetch error:', error);
+          setAppointments([]);
+        });
     }
   }, [status]);
 
   const filteredAppointments = selectedStatus === 'all'
-    ? appointments
+    ? appointments.sort((a, b) => {
+        // İptal edilen randevuları en alta taşı
+        if (a.status === 'cancelled' && b.status !== 'cancelled') return 1;
+        if (a.status !== 'cancelled' && b.status === 'cancelled') return -1;
+        // Diğer durumlar için tarih sırasına göre sırala
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      })
     : appointments.filter(app => app.status === selectedStatus);
 
   const handleShowDetails = (appointment: Appointment) => {
@@ -60,8 +78,12 @@ export default function AppointmentsPage() {
       });
       
       if (response.ok) {
-        // Liste güncelle - iptal edilen randevuyu kaldır
-        setAppointments(prev => prev.filter(app => app.id !== selectedAppointment.id));
+        // Liste güncelle - iptal edilen randevunun durumunu güncelle
+        setAppointments(prev => prev.map(app => 
+          app.id === selectedAppointment.id 
+            ? { ...app, status: 'cancelled' }
+            : app
+        ));
         setShowCancelModal(false);
         setSelectedAppointment(null);
       } else {
@@ -144,6 +166,20 @@ export default function AppointmentsPage() {
           >
             Tamamlanan
           </button>
+          <button
+            onClick={() => setSelectedStatus('cancelled')}
+            className={`px-6 py-2 rounded-xl font-semibold transition-all ${
+              selectedStatus === 'cancelled'
+                ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
+                : theme === 'default'
+                  ? 'bg-white/10 text-white/80 hover:bg-white/20'
+                  : theme === 'third'
+                    ? 'bg-[#222222] text-[#999999] hover:bg-[#333333] border border-[#333333]'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            İptal Edilen
+          </button>
         </div>
 
         {/* Randevu Listesi */}
@@ -159,7 +195,7 @@ export default function AppointmentsPage() {
                   : theme === 'third'
                     ? 'bg-[#111111]/90 border border-[#333333]'
                     : 'bg-white border border-gray-200 shadow-lg'
-              } ${appointment.status === 'cancelled' ? 'opacity-50 grayscale' : ''}`}
+              } ${appointment.status === 'cancelled' ? 'opacity-60 grayscale border-red-500/30' : ''}`}
             >
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -213,7 +249,10 @@ export default function AppointmentsPage() {
                     </div>
                   )}
                   {appointment.status === 'cancelled' && (
-                    <div className="flex items-center text-red-400 font-semibold">İptal Edildi</div>
+                    <div className="flex items-center text-red-400 font-semibold">
+                      <FaTimes className="mr-2" />
+                      İptal Edildi
+                    </div>
                   )}
                 </div>
               </div>

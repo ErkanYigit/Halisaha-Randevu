@@ -287,20 +287,29 @@ export default function FieldsPage() {
   const isSlotReserved = (fieldId: string, date: Date | null): boolean => {
     if (!date) return false;
     
-    // Sadece backend'den gelen dolu saatleri kontrol et (yerel rezervasyonları şimdilik devre dışı bırak)
+    // Yerel rezervasyonları kontrol et (kullanıcının yaptığı rezervasyonlar)
+    const local = reservations.some(r => 
+      r.fieldId === fieldId && 
+      r.date.toDateString() === date.toDateString() && 
+      r.date.getHours() === date.getHours()
+    );
+    
+    // Backend'den gelen dolu saatleri kontrol et (confirmed ve cancelled olanlar)
     const backend = (Array.isArray(busySlots) ? busySlots : []).some(slot => {
       if (!slot.startTime) return false;
       try {
         const slotStart = new Date(slot.startTime);
         const isSameDate = slotStart.toDateString() === date.toDateString();
         const isSameHour = slotStart.getHours() === date.getHours();
-        return isSameDate && isSameHour;
+        // İptal edilen randevuların saatleri de dolu gözüksün
+        return isSameDate && isSameHour && (slot.status === 'confirmed' || slot.status === 'cancelled');
       } catch (error) {
+        console.error('Tarih parse hatası:', error, slot);
         return false;
       }
     });
     
-    return backend;
+    return local || backend;
   };
 
   const handleReservation = async () => {

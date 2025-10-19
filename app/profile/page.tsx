@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useTheme } from '../context/ThemeContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Box,
   Button,
@@ -65,6 +65,22 @@ interface Payment {
 
 type CityType = { name: string; districts: string[] };
 const cities: CityType[] = turkeyCities as CityType[];
+
+// URL parametresi kontrolü için ayrı component
+function TopupHandler({ onTopupOpen }: { onTopupOpen: () => void }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (searchParams?.get('topup') === 'true') {
+      onTopupOpen();
+      // URL'den parametreyi temizle
+      router.replace('/profile');
+    }
+  }, [searchParams, router, onTopupOpen]);
+
+  return null;
+}
 
 export default function ProfilePage() {
   const { theme } = useTheme();
@@ -351,13 +367,17 @@ export default function ProfilePage() {
   }
 
   return (
-    <Box minH="100vh" bgGradient={
-      theme === 'default' 
-        ? "linear(to-br, #4f1c96, #6d28d9, #a21caf)" 
-        : theme === 'third'
-          ? "linear(to-br, black, #111111, #222222)"
-          : "linear(to-br, #f0f9ff, #e0f2fe, #dbeafe)"
-    } p={6}>
+    <>
+      <Suspense fallback={null}>
+        <TopupHandler onTopupOpen={() => setIsTopupModalOpen(true)} />
+      </Suspense>
+      <Box minH="100vh" bgGradient={
+        theme === 'default' 
+          ? "linear(to-br, #4f1c96, #6d28d9, #a21caf)" 
+          : theme === 'third'
+            ? "linear(to-br, black, #111111, #222222)"
+            : "linear(to-br, #f0f9ff, #e0f2fe, #dbeafe)"
+      } p={6}>
       <Flex direction="column" align="center" maxW="3xl" mx="auto" gap={8}>
         {/* Profil Kartı */}
         <Box w="full" bg={
@@ -735,6 +755,7 @@ export default function ProfilePage() {
         <HistoryModal />
         <PaymentsModal />
       </Flex>
-    </Box>
+      </Box>
+    </>
   );
 } 
