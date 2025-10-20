@@ -82,6 +82,21 @@ function TopupHandler({ onTopupOpen }: { onTopupOpen: () => void }) {
   return null;
 }
 
+// Ayarlar modali için URL parametresi kontrolü
+function SettingsHandler({ onSettingsOpen }: { onSettingsOpen: () => void }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (searchParams?.get('settings') === 'true') {
+      onSettingsOpen();
+      router.replace('/profile');
+    }
+  }, [searchParams, router, onSettingsOpen]);
+
+  return null;
+}
+
 export default function ProfilePage() {
   const { theme } = useTheme();
   const { data: session, status } = useSession();
@@ -370,6 +385,9 @@ export default function ProfilePage() {
     <>
       <Suspense fallback={null}>
         <TopupHandler onTopupOpen={() => setIsTopupModalOpen(true)} />
+      </Suspense>
+      <Suspense fallback={null}>
+        <SettingsHandler onSettingsOpen={() => setIsEditing(true)} />
       </Suspense>
       <Box minH="100vh" bgGradient={
         theme === 'default' 

@@ -255,7 +255,7 @@ const Navbar = () => {
                     </Link>
                     
                     <Link
-                      href="/profile/settings"
+                      href="/profile?settings=true"
                       onClick={() => setIsProfileMenuOpen(false)}
                       className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
                         theme === 'default'
